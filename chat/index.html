@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      padding: 20px;
+    }
+    #chatContainer {
+      width: 400px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    #chatBody {
+      height: 300px;
+      overflow-y: scroll;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    .message {
+      padding: 8px 12px;
+      margin: 5px 0;
+      border-radius: 10px;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+    .sent {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      text-align: right;
+    }
+    .received {
+      background-color: #eee;
+      align-self: flex-start;
+    }
+    .message-time {
+      font-size: 0.75em;
+      color: #555;
+      margin-top: 2px;
+    }
+    #inputSection {
+      display: flex;
+      padding: 10px;
+    }
+    #messageInput {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+    }
+    #sendBtn {
+      margin-left: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 20px;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="chatContainer">
+    <div id="chatBody"></div>
+    <div id="inputSection">
+      <input type="text" id="messageInput" placeholder="Type your message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <!-- Socket.IO CDN -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script>
+    const socket = io('http://localhost:3000', {
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+
+    const taskId = 'task123'; // Simulate a task ID
+    const sender = 'faculty'; // Change this to 'hod' or 'teacher' as needed
+
+    socket.emit('joinTask', taskId);
+
+    socket.on('previousMessages', (messages) => {
+      messages.forEach(msg => displayMessage(msg));
+    });
+
+    socket.on('newMessage', (message) => {
+      displayMessage(message);
+    });
+
+    function displayMessage(msg) {
+      const chatBody = document.getElementById('chatBody');
+      const msgElement = document.createElement('div');
+      msgElement.className = `message ${msg.sender === sender ? 'sent' : 'received'}`;
+      msgElement.innerHTML = `
+        ${msg.message}
+        <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+      `;
+      chatBody.appendChild(msgElement);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        socket.emit('sendMessage', { taskId, sender, message });
+        messageInput.value = '';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Developer Dashboard - AcharyaConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fc;
+      color: #003366;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .dashboard {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .dark-mode body {
+      background-color: #1e1e2f;
+      color: #e0e0e0;
+    }
+
+    .dark-mode .dashboard {
+      background-color: #2c2c3e;
+      color: #e0e0e0;
+    }
+
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .profile-section img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .profile-details h2 {
+      font-size: 1.5rem;
+      color: inherit;
+    }
+
+    .role-label {
+      background-color: #ff8800;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+
+    .form-section {
+      background: #e6f0ff;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+
+    .dark-mode .form-section {
+      background: #3b3b52;
+    }
+
+    .form-section input,
+    .form-section select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-family: 'Poppins';
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    .form-section button {
+      background-color: #003366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .form-section button:hover {
+      background-color: #001f4d;
+    }
+
+    .user-list {
+      margin-top: 20px;
+    }
+
+    .user-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f0f8ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .dark-mode .user-card {
+      background: #474761;
+    }
+
+    .user-info span {
+      display: block;
+    }
+
+    .user-role {
+      color: #ff8800;
+      font-weight: bold;
+    }
+
+    .remove-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    .remove-btn:hover {
+      background-color: #b30000;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #003366;
+    }
+
+    .dark-mode .dark-toggle {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Dark Mode Toggle -->
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+
+    <!-- Developer Profile -->
+    <div class="profile-section">
+      <img src="https://via.placeholder.com/80?text=D" alt="Developer Photo">
+      <div class="profile-details">
+        <h2>Ravi Kumar</h2>
+        <span class="role-label">Developer</span>
+      </div>
+    </div>
+
+    <!-- Create New User Form -->
+    <div class="form-section">
+      <h3>Create New Account</h3>
+      <input type="text" id="newName" placeholder="Full Name">
+      <input type="text" id="newAuid" placeholder="AUID (e.g. AITF123)">
+      <select id="newRole">
+        <option value="">Select Role</option>
+        <option value="Principal">Principal</option>
+        <option value="HOD">HOD</option>
+        <option value="Faculty">Faculty</option>
+      </select>
+      <button onclick="createUser()">Create Account</button>
+    </div>
+
+    <!-- List of Existing Users -->
+    <div class="user-list">
+      <h3>Manage Users</h3>
+      <div id="userContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    let users = [
+      { name: 'Dr. Kavitha', auid: 'AITHOD001', role: 'HOD' },
+      { name: 'Prof. Latha', auid: 'AITF002', role: 'Faculty' },
+      { name: 'Dr. Rajesh', auid: 'AITF003', role: 'Faculty' },
+    ];
+
+    function renderUsers() {
+      const container = document.getElementById('userContainer');
+      container.innerHTML = '';
+      users.forEach((user, index) => {
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        card.innerHTML = `
+          <div class="user-info">
+            <span><strong>${user.name}</strong></span>
+            <span>AUID: ${user.auid}</span>
+            <span class="user-role">${user.role}</span>
+          </div>
+          <button class="remove-btn" onclick="removeUser(${index})">Remove Access</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function createUser() {
+      const name = document.getElementById('newName').value;
+      const auid = document.getElementById('newAuid').value;
+      const role = document.getElementById('newRole').value;
+
+      if (!name || !auid || !role) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      users.push({ name, auid, role });
+      renderUsers();
+
+      document.getElementById('newName').value = '';
+      document.getElementById('newAuid').value = '';
+      document.getElementById('newRole').value = '';
+
+      alert("New user created successfully!");
+    }
+
+    function removeUser(index) {
+      const confirmDelete = confirm("Are you sure you want to remove access for this user?");
+      if (confirmDelete) {
+        users.splice(index, 1);
+        renderUsers();
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    // Initialize
+    renderUsers();
+  </script>
+</body>
+</html>

@@ -30,40 +30,40 @@
     header {
       background-color: var(--white);
       color: var(--blue);
-      padding: 10px 20px;
+      padding: 20px 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 2px solid var(--blue);
+      /* border-bottom: 2px solid var(--blue); */
       transition: background-color 0.3s, color 0.3s, border-bottom 0.3s;
     }
 
     body.dark header {
       background-color: #2a2a2a;
       color: var(--dark-text);
-      border-bottom: 2px solid #1e2a78;
+      /* border-bottom: 2px solid #1e2a78; */
     }
 
     .profile {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 22px;
     }
 
     .profile img {
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       object-fit: cover;
     }
 
     .info h2, .info p {
-      margin: 0;
+      margin: 2px;
     }
 
     .info h2 {
       color: var(--blue);
-      font-size: 20px;
+      font-size: 23px;
     }
 
     body.dark .info h2 {
@@ -71,7 +71,7 @@
     }
 
     .info p {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     body.dark .info p {
@@ -82,7 +82,7 @@
       background-color: var(--orange);
       color: var(--blue);
       border: none;
-      padding: 5px 10px;
+      padding: 6px 10px;
       border-radius: 5px;
       cursor: default;
       font-weight: bold;
@@ -94,61 +94,58 @@
     }
 
     .right-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    display: flex;
+    align-items: center;
+    gap: 12px; /* space between buttons */
+}
 
-    .theme-toggle {
-      background-color: var(--white);
-      border: 2px solid var(--orange);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
 
+.theme-toggle {
+    background: linear-gradient(to bottom, #ff8c00, #ff4500);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+}
     body.dark .theme-toggle {
-      background-color: #333;
+      background-color: orangered;
       border-color: #e06c3e;
       color: var(--dark-text);
     }
 
     .logout-btn {
-      background-color: red;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      text-transform: uppercase;
-      font-weight: bold;
-    }
-
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+}
     body.dark .logout-btn {
-      background-color: darkred;
+      background-color: red;
       color: var(--dark-text);
     }
 
     main {
-      padding: 20px;
+      padding: 0px;
     }
 
     .task-area {
       background: var(--white);
-      border-radius: 12px;
+      /* border-radius: 12px; */
       padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      /* box-shadow: 0 0 10px rgba(0,0,0,0.05); */
       margin-bottom: 20px;
     }
 
     body.dark .task-area {
       background: #2a2a2a;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+      /* box-shadow: 0 0 10px rgba(255,255,255,0.1); */
     }
 
     .task-area h3 {
@@ -594,6 +591,7 @@
     }
 
     .stat-box {
+      display: grid;
       background: var(--blue);
       color: #ffffff;
       padding: 20px;
@@ -601,7 +599,7 @@
       flex: 1;
       min-width: 150px;
       text-align: center;
-      font-size: 18px;
+      font-size: 45px;
     }
 
     body.dark .stat-box {
@@ -610,7 +608,7 @@
     }
 
     .stat-box span {
-      font-size: 14px;
+      font-size: 20px;
       display: block;
       margin-top: 5px;
       color: #ffffff;
@@ -688,7 +686,7 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 1px;
-      border: 1px solid #ccc;
+      /* border: 1px solid #ccc; */
     }
 
     .day-name, .day {
@@ -1050,7 +1048,7 @@
     </div>
   </div>
   <div class="right-header">
-    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
     <button class="logout-btn">Logout</button>
   </div>
 </header>

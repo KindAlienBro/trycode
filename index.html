@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website with Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            /* Theme Variables (Light Mode Only) */
+            --primary-color: #0D2F5B;
+            --accent-color: #F9A825;
+            --accent-hover-color: #F57F17;
+            --background-color: #f0f2f5; /* Page background */
+            --surface-color: #ffffff;   /* Chat popup background */
+            --text-color: #333333;
+            --text-color-light: #ffffff; /* For text on dark backgrounds like buttons */
+            --text-muted-color: #6c757d;
+            --border-color: #e0e0e0;
+            --user-msg-bg: #D1E8FF;
+            --bot-msg-bg: #E9ECEF;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --header-text-color: #ffffff;
+            --button-text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* --- Main Website Placeholder Styling --- */
+        .main-website-content {
+            padding: 50px;
+            text-align: center;
+            min-height: 150vh;
+        }
+        .main-website-content h1 {
+            color: var(--primary-color);
+        }
+        .main-website-content p {
+            color: var(--text-muted-color);
+        }
+
+        /* --- Chat Trigger Button --- */
+        #chatTriggerButton {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--accent-color);
+            color: var(--button-text-color);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.8em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            z-index: 999;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        #chatTriggerButton:hover {
+            background-color: var(--accent-hover-color);
+            transform: scale(1.1);
+        }
+
+        /* --- Chat Popup Container --- */
+        #chatPopupContainer {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: clamp(300px, 30vw, 400px);
+            height: clamp(400px, 60vh, 600px);
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        #chatPopupContainer.open {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .chat-header {
+            background-color: var(--primary-color);
+            color: var(--header-text-color);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        #closeChatButton {
+            background: none;
+            border: none;
+            color: var(--header-text-color);
+            font-size: 1.3em;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        #closeChatButton:hover {
+            opacity: 0.8;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: fadeInMessage 0.4s forwards;
+            line-height: 1.4;
+            font-size: 0.95em;
+            background-color: var(--bot-msg-bg); /* Default for bot */
+            color: var(--text-color);
+        }
+        @keyframes fadeInMessage {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .message p { margin: 0; }
+
+        .user-message {
+            background-color: var(--user-msg-bg);
+            align-self: flex-end;
+            border-bottom-right-radius: 3px;
+        }
+        .bot-message {
+            background-color: var(--bot-msg-bg);
+            align-self: flex-start;
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            flex-shrink: 0;
+        }
+
+        #userInput {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            background-color: var(--background-color); /* Slightly different for depth */
+            color: var(--text-color);
+            resize: none;
+            font-size: 0.9em;
+            margin: 0 8px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        #userInput::placeholder { color: var(--text-muted-color); }
+
+        .attach-button,
+        #sendButton {
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .attach-button {
+            background-color: transparent;
+            color: var(--text-muted-color);
+        }
+        .attach-button:hover {
+            background-color: var(--bot-msg-bg);
+            color: var(--primary-color);
+        }
+        #sendButton {
+            background-color: var(--accent-color);
+            color: var(--button-text-color);
+            margin-left: 5px;
+        }
+        #sendButton:hover { background-color: var(--accent-hover-color); }
+        #sendButton i { transition: transform 0.3s ease; }
+        #sendButton:active i { transform: translateX(2px) scale(0.9); }
+
+        .file-preview-area {
+            padding: 0 15px 8px;
+            font-size: 0.85em;
+            color: var(--text-muted-color);
+        }
+        .file-preview-area p {
+            margin: 0;
+            padding: 4px 6px;
+            background-color: var(--bot-msg-bg);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .typing-indicator span {
+            display: inline-block; width: 6px; height: 6px; margin: 0 1.5px;
+            background-color: var(--text-muted-color); border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+
+        .chat-box::-webkit-scrollbar { width: 6px; }
+        .chat-box::-webkit-scrollbar-track { background: transparent; }
+        .chat-box::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        .chat-box::-webkit-scrollbar-thumb:hover { background: var(--text-muted-color); }
+    </style>
+</head>
+<body>
+
+    <div class="main-website-content">
+        <h1>Welcome to My Awesome Website!</h1>
+        <p>This is where your main content goes. Scroll down to see the chat trigger button stay in place.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ... (add more content to make the page scrollable)</p>
+    </div>
+
+    <button id="chatTriggerButton" title="Open Chat">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <div id="chatPopupContainer">
+        <header class="chat-header">
+            <h1>Chat Assistant</h1>
+            <button id="closeChatButton" title="Close Chat">
+                <i class="fas fa-times"></i>
+            </button>
+        </header>
+        <main class="chat-box" id="chatBox">
+            <div class="message bot-message">
+                <p>Hello! How can I help you today?</p>
+            </div>
+        </main>
+        <footer class="chat-input-area">
+            <label for="file-input" class="attach-button" title="Attach File">
+                <i class="fas fa-paperclip"></i>
+            </label>
+            <input type="file" id="file-input" style="display: none;">
+            <textarea id="userInput" placeholder="Type your message..." rows="1"></textarea>
+            <button id="sendButton" title="Send Message">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </footer>
+        <div id="file-preview" class="file-preview-area"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatPopupContainer = document.getElementById('chatPopupContainer');
+            const chatTriggerButton = document.getElementById('chatTriggerButton');
+            const closeChatButton = document.getElementById('closeChatButton');
+            const chatBox = document.getElementById('chatBox');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const fileInput = document.getElementById('file-input');
+            const filePreviewArea = document.getElementById('file-preview');
+
+            const BACKEND_URL = 'https://chat-bot-744w.onrender.com/chat'; // YOUR BACKEND URL
+            let attachedFile = null;
+
+            chatTriggerButton.addEventListener('click', () => {
+                chatPopupContainer.classList.toggle('open');
+                if (chatPopupContainer.classList.contains('open')) {
+                    userInput.focus();
+                }
+            });
+
+            closeChatButton.addEventListener('click', () => {
+                chatPopupContainer.classList.remove('open');
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && chatPopupContainer.classList.contains('open')) {
+                    chatPopupContainer.classList.remove('open');
+                }
+            });
+
+            function addMessage(text, sender, isHtml = false) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', `${sender}-message`);
+                if (isHtml) {
+                    messageElement.innerHTML = text;
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = text;
+                    messageElement.appendChild(p);
+                }
+                chatBox.appendChild(messageElement);
+                setTimeout(() => messageElement.style.opacity = 1, 0); 
+                chatBox.scrollTop = chatBox.scrollHeight;
+                return messageElement;
+            }
+
+            let typingIndicatorElement = null;
+            function showTypingIndicator() {
+                if (typingIndicatorElement) return;
+                typingIndicatorElement = addMessage(
+                    '<div class="typing-indicator"><span></span><span></span><span></span></div>',
+                    'bot', true
+                );
+            }
+
+            function removeTypingIndicator() {
+                if (typingIndicatorElement) {
+                    typingIndicatorElement.remove();
+                    typingIndicatorElement = null;
+                }
+            }
+
+            async function sendMessage() {
+                const userText = userInput.value.trim();
+                if (!userText && !attachedFile) {
+                    userInput.focus();
+                    return;
+                }
+
+                if (userText) {
+                    addMessage(userText, 'user');
+                }
+                if (attachedFile) {
+                    addMessage(`File attached: ${attachedFile.name}`, 'user');
+                }
+
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                filePreviewArea.innerHTML = '';
+                const currentFile = attachedFile;
+                attachedFile = null;
+                fileInput.value = '';
+
+                showTypingIndicator();
+
+                try {
+                    const payload = { message: userText };
+                    if (currentFile) {
+                        console.log("File was attached, but this example doesn't send its content.");
+                    }
+
+                    const response = await fetch(BACKEND_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    removeTypingIndicator();
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ reply: "Error connecting to the bot." }));
+                        addMessage(`Error: ${response.status} - ${errorData.reply || "Could not get a response."}`, 'bot');
+                        return;
+                    }
+
+                    const data = await response.json();
+                    if (data.reply) {
+                        addMessage(data.reply, 'bot');
+                    } else {
+                        addMessage("Bot didn't provide a valid reply.", 'bot');
+                    }
+
+                } catch (error) {
+                    removeTypingIndicator();
+                    console.error('Error sending message:', error);
+                    addMessage('Sorry, something went wrong. Please try again.', 'bot');
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            userInput.addEventListener('input', () => {
+                userInput.style.height = 'auto';
+                userInput.style.height = (userInput.scrollHeight) + 'px';
+            });
+            
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    attachedFile = file;
+                    filePreviewArea.innerHTML = `<p>Selected: ${file.name} <button id="removeFileBtn" style="margin-left: 5px; border:none; background:transparent; color:red; cursor:pointer; font-weight:bold;">×</button></p>`;
+                    document.getElementById('removeFileBtn').addEventListener('click', () => {
+                        attachedFile = null;
+                        fileInput.value = '';
+                        filePreviewArea.innerHTML = '';
+                    });
+                } else {
+                    attachedFile = null;
+                    filePreviewArea.innerHTML = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
